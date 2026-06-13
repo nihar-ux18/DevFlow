@@ -1,0 +1,12 @@
+/* globals stylesheet */
+@import "tailwindcss";
+
+html, body,#root{
+    width: 100%;
+    min-height : 100vh;
+}
+
+body{
+    background-color: #09090b;
+    color: #fafafa;
+}
