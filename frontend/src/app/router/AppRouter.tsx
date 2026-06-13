@@ -1,15 +1,32 @@
-import React from 'react';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-interface AppRouterProps {
-  children?: React.ReactNode;
+import DashboardLayout from "../layouts/DashboardLayout";
+
+import DashboardPage from "../../pages/Dashboard/DashboardPage";
+import TasksPage from "../../pages/Tasks/TasksPage";
+import NotesPage from "../../pages/Notes/NotesPage";
+
+export default function AppRouter() {
+  return(
+    <BrowserRouter>
+      <Routes>
+        <Route element={<DashboardLayout/>}>
+        <Route 
+        	path="/"
+			element={<DashboardPage/>}
+		/>
+
+		<Route 
+        	path="/tasks"
+			element={<TasksPage/>}
+		/>
+
+		<Route 
+        	path="/notes"
+			element={<NotesPage/>}
+		/>
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  )
 }
-
-export const AppRouter: React.FC<AppRouterProps> = ({ children }) => {
-  return (
-    <div className="approuter">
-      {children || 'AppRouter Component'}
-    </div>
-  );
-};
-
-export default AppRouter;

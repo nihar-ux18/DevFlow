@@ -1,12 +1,11 @@
 import React from 'react';
 
-export const NotesPage: React.FC = () => {
+export default function NotesPage() {
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold">NotesPage</h1>
-      <p className="mt-2 text-gray-600">Welcome to the Notes view.</p>
+      <h1 className="text-3xl font-bold">
+        Notes Page
+      </h1>
     </div>
   );
 };
-
-export default NotesPage;

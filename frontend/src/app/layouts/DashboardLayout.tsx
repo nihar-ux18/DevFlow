@@ -1,15 +1,16 @@
 import React from 'react';
+import {Outlet} from 'react-router-dom';
 
-interface DashboardLayoutProps {
-  children?: React.ReactNode;
-}
+export default function DashboardLayout() {
+  return(
+    <div className="flex min-h-screen">
+      <aside className="w-64 border-r border-zinc-800">
+      Sidebar
+      </aside>
 
-export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
-  return (
-    <div className="dashboardlayout">
-      {children || 'DashboardLayout Component'}
+      <main className="flex-1">
+       <Outlet />
+      </main>
     </div>
   );
-};
-
-export default DashboardLayout;
+}

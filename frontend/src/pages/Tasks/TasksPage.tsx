@@ -1,12 +1,11 @@
 import React from 'react';
 
-export const TasksPage: React.FC = () => {
+export default function TasksPage() {
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold">TasksPage</h1>
-      <p className="mt-2 text-gray-600">Welcome to the Tasks view.</p>
+      <h1 className="text-3xl font-bold">
+        Tasks Page
+      </h1>
     </div>
   );
-};
-
-export default TasksPage;
+}

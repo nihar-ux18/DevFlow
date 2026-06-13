@@ -1,12 +1,11 @@
 import React from 'react';
 
-export const LearningPage: React.FC = () => {
+export default function LearningPage() {
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold">LearningPage</h1>
-      <p className="mt-2 text-gray-600">Welcome to the Learning view.</p>
+      <h1 className="text-3xl font-bold">
+        Learning Page
+      </h1>
     </div>
   );
-};
-
-export default LearningPage;
+}
