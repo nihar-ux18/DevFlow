@@ -1,6 +1,6 @@
 import type { ButtonHTMLAttributes } from "react";
 import { cn } from "../../../utils/cn";
-type Variant = "primary"|"secondary"|"ghost";
+type Variant = "primary"|"secondary"|"ghost"|"outline";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     variant ?: Variant;
@@ -17,6 +17,8 @@ export const Button = ({ variant = "primary", className, ...props}: ButtonProps)
                     "bg-zinc-800 text-white hover:bg-zinc-700",
                 variant == "ghost" &&
                     "bg-zinc-800 hover:bg-zinc-300",
+                variant == "outline" &&
+                    "border boder-zinc-700 bg-transparent hover:bg-zinc-800",
                     className
             )}
             {...props}

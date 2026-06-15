@@ -1,15 +1,14 @@
-import React from 'react';
+import { Navigate } from "react-router-dom";
+import { useAuthStore } from "../../store/auth.store";
 
-interface ProtectedRouteProps {
-  children?: React.ReactNode;
+interface Props{
+	children: React.ReactNode;
 }
+export default function ProtectedRoute({
+	children,}:Props){
+		const isAuthenticated = useAuthStore((state)=>state.isAuthenticated);
 
-export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-  return (
-    <div className="protectedroute">
-      {children || 'ProtectedRoute Component'}
-    </div>
-  );
-};
+		if(isAuthenticated) {return <Navigate to="/" replace /> }
 
-export default ProtectedRoute;
+		return children;
+	}
