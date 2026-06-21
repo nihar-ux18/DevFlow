@@ -79,35 +79,6 @@ export interface CodeUpdateData {
 export interface RoomParticipantsData {
   participants: string[];
 }
-export interface SocketUser {
-  socketId: string;
-  username: string;
-  roomId: string;
-}
-
-export interface CodeChangeData {
-  roomId: string;
-  code: string;
-}
-
-export interface TypingData {
-  roomId: string;
-  isTyping: boolean;
-}
-
-export interface UserJoinedData {
-  username: string;
-  message: string;
-}
-
-export interface CodeUpdateData {
-  code: string;
-  from: string;
-}
-
-export interface RoomParticipantsData {
-  participants: string[];
-}
 
 export interface UserLeftData {
   username: string;
@@ -118,7 +89,6 @@ export interface UserTypingData {
   username: string;
   isTyping: boolean;
 }
-
 
 export interface EditorProps {
   roomId: string;
