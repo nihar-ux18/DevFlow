@@ -2,12 +2,12 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { SocketProvider } from './context/SocketContext';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Room from './pages/Room';
 
-// Protected Route Component
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
   
@@ -27,6 +27,15 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
   }
   
   return <>{children}</>;
+};
+const RoomWithSocket: React.FC = () => {
+  return (
+    <ProtectedRoute>
+      <SocketProvider>
+        <Room />
+      </SocketProvider>
+    </ProtectedRoute>
+  );
 };
 
 const AppContent: React.FC = () => {
@@ -63,11 +72,7 @@ const AppContent: React.FC = () => {
           />
           <Route
             path="/room/:roomId"
-            element={
-              <ProtectedRoute>
-                <Room />
-              </ProtectedRoute>
-            }
+            element={<RoomWithSocket />}
           />
           <Route path="/" element={<Navigate to="/dashboard" />} />
         </Routes>

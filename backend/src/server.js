@@ -63,17 +63,27 @@ const users = {};
 io.on('connection', (socket) => {
     console.log(`🟢 New client connected: ${socket.id}`);
 
+    // Join Room Event
     socket.on('join-room', ({ roomId, username }) => {
+        // Leave previous rooms
+        const previousRoom = users[socket.id]?.roomId;
+        if (previousRoom && previousRoom !== roomId) {
+            socket.leave(previousRoom);
+        }
+
+        // Join new room
         socket.join(roomId);
         users[socket.id] = { username, roomId };
 
         console.log(`👤 ${username} joined room: ${roomId}`);
 
+        // Notify others
         socket.to(roomId).emit('user-joined', {
             username,
             message: `${username} has joined the room!`
         });
 
+        // Send current participants to the new user
         const roomSockets = io.sockets.adapter.rooms.get(roomId);
         const participants = [];
         if (roomSockets) {
@@ -84,30 +94,54 @@ io.on('connection', (socket) => {
             });
         }
         socket.emit('room-participants', { participants });
+
+        // Broadcast updated participant list to everyone
+        io.to(roomId).emit('participants-update', { participants });
     });
 
+    // Code Change Event
     socket.on('code-change', ({ roomId, code }) => {
+        const username = users[socket.id]?.username || 'Anonymous';
         socket.to(roomId).emit('code-update', {
             code,
-            from: users[socket.id]?.username || 'Anonymous'
+            from: username
         });
     });
 
+    // Typing Indicator
     socket.on('typing', ({ roomId, isTyping }) => {
-        socket.to(roomId).emit('user-typing', {
-            username: users[socket.id]?.username,
-            isTyping
-        });
+        const username = users[socket.id]?.username;
+        if (username) {
+            socket.to(roomId).emit('user-typing', {
+                username,
+                isTyping
+            });
+        }
     });
 
+    // Disconnect
     socket.on('disconnect', () => {
         if (users[socket.id]) {
             const { username, roomId } = users[socket.id];
             console.log(`🔴 ${username} disconnected from ${roomId}`);
+
             socket.to(roomId).emit('user-left', {
                 username,
                 message: `${username} has left the room.`
             });
+
+            // Update participants list
+            const roomSockets = io.sockets.adapter.rooms.get(roomId);
+            const participants = [];
+            if (roomSockets) {
+                roomSockets.forEach((socketId) => {
+                    if (users[socketId]) {
+                        participants.push(users[socketId].username);
+                    }
+                });
+            }
+            io.to(roomId).emit('participants-update', { participants });
+
             delete users[socket.id];
         }
     });
