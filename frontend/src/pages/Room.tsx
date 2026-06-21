@@ -6,6 +6,9 @@ import { roomService } from '../services/api';
 import { Room as RoomType } from '../types';
 import CodeEditor from '../components/Editor';
 import toast from 'react-hot-toast';
+import VideoCall from '../components/VideoCall';
+import Chat from '../components/Chat';
+import Participants from '../components/Participants';
 
 const Room: React.FC = () => {
   const { roomId } = useParams<{ roomId: string }>();
@@ -14,6 +17,7 @@ const Room: React.FC = () => {
   const { isConnected } = useSocket();
   const [room, setRoom] = useState<RoomType | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [activeTab, setActiveTab] = useState<'editor' | 'video' | 'chat'>('editor');
 
   useEffect(() => {
     const fetchRoom = async (): Promise<void> => {
@@ -37,7 +41,7 @@ const Room: React.FC = () => {
 
   const handleLeaveRoom = async (): Promise<void> => {
     if (!roomId) return;
-    
+
     try {
       await roomService.leave(roomId);
       toast.success('Left room');
@@ -107,34 +111,63 @@ const Room: React.FC = () => {
 
       <div className="flex-1 max-w-7xl mx-auto p-6 w-full">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-full">
-          <div className="lg:col-span-3 h-[calc(100vh-200px)]">
-            <div className="card h-full p-0 overflow-hidden">
-              <CodeEditor
-                roomId={room.roomId}
-                initialCode={room.code}
-                language={room.language}
-                username={user?.username}
-              />
+          <div className="lg:col-span-3 flex flex-col">
+            <div className="flex space-x-2 mb-4">
+              <button
+                onClick={() => setActiveTab('editor')}
+                className={`px-4 py-2 rounded-lg transition ${activeTab === 'editor'
+                    ? 'bg-primary-600 text-white'
+                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  }`}
+              >
+                📝 Code
+              </button>
+              <button
+                onClick={() => setActiveTab('video')}
+                className={`px-4 py-2 rounded-lg transition ${activeTab === 'video'
+                    ? 'bg-primary-600 text-white'
+                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  }`}
+              >
+                📹 Video
+              </button>
+              <button
+                onClick={() => setActiveTab('chat')}
+                className={`px-4 py-2 rounded-lg transition ${activeTab === 'chat'
+                    ? 'bg-primary-600 text-white'
+                    : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                  }`}
+              >
+                💬 Chat
+              </button>
+            </div>
+
+            <div className="flex-1">
+              {activeTab === 'editor' && (
+                <div className="card h-full p-0 overflow-hidden">
+                  <CodeEditor
+                    roomId={room.roomId}
+                    initialCode={room.code}
+                    language={room.language}
+                    username={user?.username}
+                  />
+                </div>
+              )}
+              {activeTab === 'video' && (
+                <div className="card h-full">
+                  <VideoCall roomId={room.roomId} />
+                </div>
+              )}
+              {activeTab === 'chat' && (
+                <div className="card h-full">
+                  <Chat roomId={room.roomId} />
+                </div>
+              )}
             </div>
           </div>
 
           <div className="space-y-4">
-            <div className="card">
-              <h3 className="text-lg font-semibold mb-4">Participants</h3>
-              <div className="space-y-2 max-h-[200px] overflow-y-auto">
-                {room.participants?.map((participant) => (
-                  <div key={participant._id} className="flex items-center space-x-3">
-                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                    <span className="text-sm">
-                      {participant.username}
-                      {typeof room.host !== 'string' && participant._id === room.host?._id && (
-                        <span className="text-xs text-primary-500 ml-2">(Host)</span>
-                      )}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <Participants roomId={room.roomId} />
 
             <div className="card">
               <h3 className="text-lg font-semibold mb-4">Room Info</h3>
