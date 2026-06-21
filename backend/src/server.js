@@ -8,7 +8,6 @@ const connectDB = require('./config/db');
 const authRoutes = require('./routes/auth.routes');
 const roomRoutes = require('./routes/room.routes');
 
-// Initialize
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
@@ -18,28 +17,23 @@ const io = new Server(server, {
     }
 });
 
-// ========== MIDDLEWARE ==========
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ========== DATABASE CONNECTION ==========
 connectDB();
 
-// ========== ROUTES ==========
 app.use('/api/auth', authRoutes);
 app.use('/api/rooms', roomRoutes);
 
-// Test Route
 app.get('/api/health', (req, res) => {
     res.json({
-        status: '✅ Server is running',
+        status: 'Server is running',
         timestamp: new Date(),
         environment: process.env.NODE_ENV || 'development'
     });
 });
 
-// 404 Handler
 app.use((req, res) => {
     res.status(404).json({
         success: false,
@@ -47,7 +41,6 @@ app.use((req, res) => {
     });
 });
 
-// Global Error Handler
 app.use((err, req, res, next) => {
     console.error('Global Error:', err);
     res.status(500).json({
@@ -57,33 +50,29 @@ app.use((err, req, res, next) => {
     });
 });
 
-// ========== SOCKET.IO LOGIC ==========
+
 const users = {};
+const chatHistory = {};
 
 io.on('connection', (socket) => {
-    console.log(`🟢 New client connected: ${socket.id}`);
+    console.log(`New client connected: ${socket.id}`);
 
-    // Join Room Event
     socket.on('join-room', ({ roomId, username }) => {
-        // Leave previous rooms
         const previousRoom = users[socket.id]?.roomId;
         if (previousRoom && previousRoom !== roomId) {
             socket.leave(previousRoom);
         }
 
-        // Join new room
         socket.join(roomId);
         users[socket.id] = { username, roomId };
 
-        console.log(`👤 ${username} joined room: ${roomId}`);
+        console.log(`${username} joined room: ${roomId}`);
 
-        // Notify others
         socket.to(roomId).emit('user-joined', {
             username,
             message: `${username} has joined the room!`
         });
 
-        // Send current participants to the new user
         const roomSockets = io.sockets.adapter.rooms.get(roomId);
         const participants = [];
         if (roomSockets) {
@@ -95,11 +84,13 @@ io.on('connection', (socket) => {
         }
         socket.emit('room-participants', { participants });
 
-        // Broadcast updated participant list to everyone
         io.to(roomId).emit('participants-update', { participants });
+
+        if (chatHistory[roomId]) {
+        socket.emit('previous-messages', chatHistory[roomId]);
+    }
     });
 
-    // Code Change Event
     socket.on('code-change', ({ roomId, code }) => {
         const username = users[socket.id]?.username || 'Anonymous';
         socket.to(roomId).emit('code-update', {
@@ -108,7 +99,6 @@ io.on('connection', (socket) => {
         });
     });
 
-    // Typing Indicator
     socket.on('typing', ({ roomId, isTyping }) => {
         const username = users[socket.id]?.username;
         if (username) {
@@ -119,18 +109,41 @@ io.on('connection', (socket) => {
         }
     });
 
-    // Disconnect
+    socket.on('signal', ({ roomId, signalData, targetUsername, fromUsername }) => {
+    const roomSockets = io.sockets.adapter.rooms.get(roomId);
+    if (roomSockets) {
+        roomSockets.forEach((socketId) => {
+            if (users[socketId]?.username === targetUsername) {
+                io.to(socketId).emit('signal', { signalData, fromUsername });
+            }
+        });
+    }
+});
+
+socket.on('chat-message', ({ roomId, username, message, timestamp }) => {
+    const messageData = { username, message, timestamp };
+    
+    if (!chatHistory[roomId]) {
+        chatHistory[roomId] = [];
+    }
+    chatHistory[roomId].push(messageData);
+    if (chatHistory[roomId].length > 100) {
+        chatHistory[roomId] = chatHistory[roomId].slice(-100);
+    }
+    
+    io.to(roomId).emit('chat-message', messageData);
+});
+
     socket.on('disconnect', () => {
         if (users[socket.id]) {
             const { username, roomId } = users[socket.id];
-            console.log(`🔴 ${username} disconnected from ${roomId}`);
+            console.log(`${username} disconnected from ${roomId}`);
 
             socket.to(roomId).emit('user-left', {
                 username,
                 message: `${username} has left the room.`
             });
 
-            // Update participants list
             const roomSockets = io.sockets.adapter.rooms.get(roomId);
             const participants = [];
             if (roomSockets) {
@@ -147,14 +160,12 @@ io.on('connection', (socket) => {
     });
 });
 
-// ========== START SERVER ==========
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => {
-    console.log(`🚀 Server running on http://localhost:${PORT}`);
-    console.log(`📡 Socket.io server is ready`);
+    console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`Socket.io server is ready`);
 });
 
-// Handle unhandled promise rejections
 process.on('unhandledRejection', (err) => {
     console.error('Unhandled Rejection:', err);
 });
