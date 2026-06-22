@@ -19,7 +19,8 @@
     "paths": {
       "@/*": ["src/*"]
     },
-    "types": ["react", "react-dom", "node"]
+    "types": ["react", "react-dom", "node"],
+    "ignoreDeprecations": "6.0"
   },
   "include": ["src"],
   "references": [
