@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const { createRoom, joinRoom, getRoom, leaveRoom } = require('../controllers/room.controller');
+const { createRoom, joinRoom, getRoom, leaveRoom, getUserRooms } = require('../controllers/room.controller');
 const { protect } = require('../middleware/auth.middleware');
 
+router.get('/', protect, getUserRooms);
 router.post('/', protect, createRoom);
 router.post('/join/:roomId', protect, joinRoom);
 router.get('/:roomId', protect, getRoom);

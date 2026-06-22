@@ -4,24 +4,88 @@
 
 @layer base {
   body {
-    @apply bg-gray-900 text-gray-100 min-h-screen;
+    background-color: #0b141c;
+    color: #dae3ee;
+    font-family: 'Geist', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
   }
 }
 
 @layer components {
-  .input-field {
-    @apply w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-white;
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    vertical-align: middle;
   }
   
-  .btn-primary {
-    @apply w-full px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white font-semibold rounded-lg transition duration-200 transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-gray-900;
+  .vignette {
+    background: radial-gradient(circle, rgba(11,20,28,0) 0%, rgba(6,15,22,1) 100%);
   }
   
-  .btn-secondary {
-    @apply px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-lg transition duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500;
+  .glass-card {
+    background: rgba(24, 32, 40, 0.8);
+    backdrop-filter: blur(12px);
+    border: 1px solid #30363D;
   }
-  
-  .card {
-    @apply bg-gray-800 rounded-xl shadow-2xl p-6 border border-gray-700;
+
+  .glass-panel {
+    background: rgba(24, 32, 40, 0.7);
+    backdrop-filter: blur(8px);
   }
+
+  .setting-card {
+    border: 1px solid #30363D;
+    transition: border-color 0.2s ease;
+  }
+  .setting-card:hover {
+    border-color: #414752;
+  }
+
+  /* Scrollbars */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: #141c24;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #2d363e;
+    border-radius: 3px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #414752;
+  }
+
+  /* Monaco/Code editor scrollbar */
+  .code-editor-scroll::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  .code-editor-scroll::-webkit-scrollbar-track {
+    background: #141c24;
+  }
+  .code-editor-scroll::-webkit-scrollbar-thumb {
+    background: #414752;
+    border-radius: 4px;
+  }
+  .code-editor-scroll::-webkit-scrollbar-thumb:hover {
+    background: #8b919d;
+  }
+
+  /* Live pulse */
+  .pulse-live {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: .3; }
+  }
+
+  /* Syntax highlights fallback */
+  .syntax-keyword { color: #ff79c6; }
+  .syntax-string { color: #f1fa8c; }
+  .syntax-function { color: #50fa7b; }
+  .syntax-comment { color: #6272a4; }
+  .syntax-variable { color: #bd93f9; }
 }

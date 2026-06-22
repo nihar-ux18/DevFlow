@@ -1,5 +1,7 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import { authService } from '../services/api';
+import { AxiosError } from 'axios';
 import { User, LoginCredentials, RegisterData } from '../types';
 import toast from 'react-hot-toast';
 
@@ -56,8 +58,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setUser(user);
       toast.success('Registration successful! 🎉');
       return { success: true };
-    } catch (error: any) {
-      const message = error.response?.data?.message || 'Registration failed';
+    } catch (error) {
+      const err = error as AxiosError<{ message?: string }>;
+      const message = err.response?.data?.message || 'Registration failed';
       toast.error(message);
       return { success: false, error: message };
     }
@@ -73,8 +76,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setUser(user);
       toast.success('Welcome back! 👋');
       return { success: true };
-    } catch (error: any) {
-      const message = error.response?.data?.message || 'Login failed';
+    } catch (error) {
+      const err = error as AxiosError<{ message?: string }>;
+      const message = err.response?.data?.message || 'Login failed';
       toast.error(message);
       return { success: false, error: message };
     }

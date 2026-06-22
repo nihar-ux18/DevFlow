@@ -59,6 +59,9 @@ export const authService = {
 
 // Room Service with TypeScript
 export const roomService = {
+  list: (): Promise<AxiosResponse<ApiResponse<Room[]>>> => 
+    api.get<ApiResponse<Room[]>>('/rooms'),
+
   create: (data: CreateRoomData): Promise<AxiosResponse<ApiResponse<Room>>> => 
     api.post<ApiResponse<Room>>('/rooms', data),
   

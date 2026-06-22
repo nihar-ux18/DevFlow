@@ -137,4 +137,32 @@ const leaveRoom = async (req, res) => {
         });
     }
 };
-module.exports = { createRoom, joinRoom, getRoom, leaveRoom };
+
+const getUserRooms = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const rooms = await Room.find({
+            $or: [
+                { host: userId },
+                { participants: userId }
+            ]
+        })
+        .populate('host', 'username email')
+        .populate('participants', 'username email isOnline')
+        .sort({ updatedAt: -1 });
+
+        res.status(200).json({
+            success: true,
+            data: rooms
+        });
+    } catch (error) {
+        console.error('Get User Rooms Error:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Server Error',
+            error: error.message
+        });
+    }
+};
+
+module.exports = { createRoom, joinRoom, getRoom, leaveRoom, getUserRooms };

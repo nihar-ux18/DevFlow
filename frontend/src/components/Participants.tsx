@@ -2,49 +2,53 @@ import React, { useEffect, useState } from "react";
 import { useSocket } from "../context/SocketContext";
 import { useAuth } from "../context/AuthContext";
 
-interface ParticipantsProps { roomId: string; }
+interface ParticipantsProps {
+  roomId: string;
+}
 
 const Participants: React.FC<ParticipantsProps> = () => {
-    const [participants, setParticipants] = useState<string[]>([]);
-    const { socket, isConnected } = useSocket();
-    const { user } = useAuth();
+  const [participants, setParticipants] = useState<string[]>([]);
+  const { socket, isConnected } = useSocket();
+  const { user } = useAuth();
 
-    useEffect(() => {
-        if (!socket || !isConnected) return;
-        const handlerParticipantsUpadte = (data: { participants: string[] }) => { setParticipants(data.participants) };
-        socket.on('participants-update', handlerParticipantsUpadte);
-        return () => {
-            socket.off('participants-update', handlerParticipantsUpadte);
-        };
-    }, [socket, isConnected]);
+  useEffect(() => {
+    if (!socket || !isConnected) return;
+    const handlerParticipantsUpdate = (data: { participants: string[] }) => {
+      setParticipants(data.participants);
+    };
+    socket.on('participants-update', handlerParticipantsUpdate);
+    return () => {
+      socket.off('participants-update', handlerParticipantsUpdate);
+    };
+  }, [socket, isConnected]);
 
-    return (
-        <div className="bg-gray-800 rounded-lg p-4">
-            <h3 className="text-lg font-semibold mb-3">Participants</h3>
-            <div className="space-y-2">
-                {participants.length === 0 ? (
-                    <p className="text-sm text-gray-400">No Participants joined yet</p>
-                ) : (
-                    participants.map((username) => (
-                        <div key={username} className="flex items-center space-x-3">
-                            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                            <span className="text-sm">
-                                {username}
-                                {username === user?.username && (
-                                    <span className="text-xs text-primary-500 ml-2">(You)</span>
-                                )}
-                            </span>
-                        </div>
-                    ))
-                )}
+  return (
+    <div className="space-y-4">
+      {participants.length === 0 ? (
+        <p className="font-body-md text-body-md text-on-surface-variant text-center py-4">No participants joined yet</p>
+      ) : (
+        participants.map((username) => (
+          <div key={username} className="flex items-center justify-between group">
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <div className="w-8 h-8 rounded bg-surface-variant flex items-center justify-center border border-outline-variant">
+                  <span className="material-symbols-outlined text-[20px] text-primary" style={{ fontVariationSettings: "'FILL' 0" }}>person</span>
+                </div>
+                <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-secondary border-2 border-surface-container-low pulse-live"></div>
+              </div>
+              <div>
+                <p className="font-body-md text-body-md text-on-surface">{username}</p>
+                <p className="font-label-sm text-[10px] text-on-surface-variant uppercase tracking-tighter">Connected</p>
+              </div>
             </div>
-            <div className="mt-3 pt-3 border-t border-gray-700">
-                <span className="text-xs text-gray-400">
-                    {participants.length} participant{participants.length !== 1 ? 's' : ''} online
-                </span>
-            </div>
-        </div>
-    );
+            {username === user?.username && (
+              <span className="px-2 py-0.5 rounded bg-tertiary-container text-on-tertiary-container font-label-sm text-[10px] font-bold uppercase select-none">You</span>
+            )}
+          </div>
+        ))
+      )}
+    </div>
+  );
 };
 
 export default Participants;
